@@ -1,0 +1,52 @@
+package controller.validator;
+
+import java.util.Date;
+
+public class Validator 
+{
+	public static String validate(String field,String value,boolean required) 
+			throws RequiredFieldException 
+	{
+		if(required && (value==null || value.trim().isEmpty()))
+			throw new RequiredFieldException(field);
+
+		value = value.trim();
+
+		return value;
+	}
+
+	public static boolean validateDate(String field, Date date, boolean required)
+			throws MaximumDateException
+	{
+		Date currDate = new Date();
+		System.out.println("current date: "+currDate);
+		if(required && date.after(currDate))
+		{
+			throw new MaximumDateException(field);
+		}
+	}
+
+	public static double validate(String field, String value, boolean required, boolean hasMinimum, double minimum)
+			throws RequiredFieldException, InvalidNumberException, MinimumNumberException
+	{
+		if(required && (value==null || value.trim().isEmpty()))
+			throw new RequiredFieldException(field);
+
+		value = value.trim();
+		double number=0;
+
+		try {
+			number = Double.parseDouble(value);
+		}
+		catch(NumberFormatException e)
+		{
+			throw new InvalidNumberException(field);
+		}
+
+
+		if(hasMinimum && number<minimum)
+			throw new MinimumNumberException(field, minimum);
+
+		return number;
+	}
+}

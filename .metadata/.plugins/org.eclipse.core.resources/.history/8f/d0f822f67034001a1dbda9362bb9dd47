@@ -1,0 +1,20 @@
+package controller.validator;
+
+public class Validator 
+{
+	public static String validate(String field,String value,boolean required) throws RequiredFieldException 
+	{
+		if(required && (value==null || value.trim().isEmpty()))
+			throw new RequiredFieldException(field);
+		System.out.println("validathor");
+
+		value = value.trim();
+
+		return value;
+	}
+
+
+
+
+
+}

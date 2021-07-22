@@ -1,0 +1,11 @@
+package controller.calculation;
+
+public class PriceCalculator {
+	
+	public static int calculateTotalPrice(String customerID)
+	{
+		return 0;
+		
+	}
+
+}

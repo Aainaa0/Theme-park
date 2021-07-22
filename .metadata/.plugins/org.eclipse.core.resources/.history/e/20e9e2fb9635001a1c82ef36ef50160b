@@ -1,0 +1,13 @@
+package controller.calculation;
+
+import java.util.ArrayList;
+
+public class InsertIntoEntryRecord {
+	public static void sqlEntryRecord(ArrayList array, String customerID) 
+	{
+		System.out.println(array);
+		
+		
+	}
+
+}

@@ -1,0 +1,133 @@
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.border.EmptyBorder;
+
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.Statement;
+
+import controller.calculation.AgeCalculator;
+
+import javax.swing.JLabel;
+import java.awt.Font;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+
+public class SelectAttraction extends JDialog {
+
+	private String dob = null;
+	private int actualAge;
+	private int height;
+	private int weight;
+
+	public SelectAttraction(JFrame frame, String customerID, String name, List list) {
+		super(frame, "Theme Park Trip Scheduler", true);
+
+		ArrayList<String> array = new ArrayList<String>();
+		for (int i = 0; i < list.size(); i++) {
+			String temp = (String) list.get(i);
+			temp = temp.substring(0, temp.indexOf(" "));
+			array.add(temp);
+		}
+		System.out.println("AttributeID: " + array);
+
+		try {
+			Connection con = null;
+			Statement st = null;
+			ResultSet rs = null;
+
+			con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/theme park", "root", "");
+			st = (Statement) con.createStatement();
+			String s = "SELECT * FROM customer WHERE CustomerID = '" + customerID + "'";
+			rs = (ResultSet) st.executeQuery(s);
+
+			if (rs.next()) {
+				dob = rs.getString(5);
+				weight = rs.getInt(7);
+				height = rs.getInt(8);
+			}
+
+			LocalDate localDob = LocalDate.parse(dob);
+
+			actualAge = AgeCalculator.calculateAge(localDob);
+			System.out.println(actualAge);
+
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(frame, "Something wrong with the query.", "Sql error",
+					JOptionPane.WARNING_MESSAGE);
+		}
+
+		HashSet<String> setAttraction = new HashSet<String>();
+
+		for (int i = 0; i < array.size(); i++) {
+			try {
+				Connection con = null;
+				Statement st = null;
+				ResultSet rs = null;
+
+				con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/theme park", "root", "");
+				st = (Statement) con.createStatement();
+				String s = "SELECT at.AttractionID, a.attractionName, a.Price FROM attractionattribute at, attraction a WHERE at.AttractionID=a.AttractionID AND at.AttributeID = '"
+						+ array.get(i) + "' AND "+actualAge+">=minimumAge AND "+weight+">=a.minimumWeight AND "+height+">=a.minimumHeight ";
+				rs = (ResultSet) st.executeQuery(s);
+
+				while (rs.next()) {
+					setAttraction.add(rs.getString(1) + " - " + rs.getString(2) + " (RM "+rs.getString(3)+")");
+				}
+
+
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(frame, "Something wrong with the query.", "Sql error",
+						JOptionPane.WARNING_MESSAGE);
+			}
+		}
+		System.out.println(setAttraction);
+		System.out.println("setAttraction.size(): "+setAttraction.size());
+
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 992, 518);
+		getContentPane().setLayout(null);
+
+		JLabel label = new JLabel("*To select multiple attractions (ctrl + right click)");
+		label.setFont(new Font("Tahoma", Font.PLAIN, 9));
+		label.setBounds(20, 28, 371, 14);
+		getContentPane().add(label);
+
+		JLabel label2 = new JLabel("Hi <dynamic>, please select your preferred attractions:");
+		label2.setBounds(20, 11, 381, 14);
+		getContentPane().add(label2);
+
+		JScrollPane scrollPane = new JScrollPane();
+		JList<String> jlist = new JList(setAttraction.toArray());
+		scrollPane.setViewportView(jlist);
+//		jlist.setLayoutOrientation(JList.VERTICAL_WRAP);
+//		jlist.setBounds(20, 53, 923, 381);
+		getContentPane().add(scrollPane);
+		getContentPane().add(jlist);
+
+		JButton btnSubmit = new JButton("Submit");
+		btnSubmit.setBounds(368, 445, 89, 23);
+		getContentPane().add(btnSubmit);
+
+		JButton btnReturn = new JButton("Back to Previous Page");
+		btnReturn.setBounds(481, 445, 167, 23);
+		getContentPane().add(btnReturn);
+
+	}
+
+}

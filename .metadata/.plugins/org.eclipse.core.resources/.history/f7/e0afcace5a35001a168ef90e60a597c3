@@ -1,0 +1,263 @@
+import java.sql.DriverManager;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Vector;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.Statement;
+
+import controller.validator.InvalidNumberException;
+import controller.validator.MaximumDateException;
+import controller.validator.MinimumNumberException;
+import controller.validator.RequiredFieldException;
+import controller.validator.Validator;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+
+public class Register extends JDialog {
+
+	private static final long serialVersionUID = 1L;
+	private JTextField textWeight;
+	private JTextField textHeight;
+	private JTextField textName;
+	private String custGender;
+	private int day;
+	private int month;
+	private int year;
+	private String date;
+	private Date mydate;
+
+	public Register(JFrame frame) {
+		super(frame, "Theme Park Trip Scheduler", true);
+		setBounds(100, 100, 675, 300);
+		getContentPane().setLayout(null);
+
+		JLabel lblName = new JLabel("Name:");
+		lblName.setHorizontalAlignment(SwingConstants.TRAILING);
+		lblName.setBounds(59, 34, 149, 14);
+		getContentPane().add(lblName);
+
+		JLabel lblDob = new JLabel("Date of Birth:");
+		lblDob.setHorizontalAlignment(SwingConstants.TRAILING);
+		lblDob.setBounds(28, 65, 180, 14);
+		getContentPane().add(lblDob);
+
+		JLabel lblGender = new JLabel("Gender:");
+		lblGender.setHorizontalAlignment(SwingConstants.TRAILING);
+		lblGender.setBounds(59, 96, 149, 14);
+		getContentPane().add(lblGender);
+
+		JLabel lblHeight = new JLabel("Height (cm):");
+		lblHeight.setHorizontalAlignment(SwingConstants.TRAILING);
+		lblHeight.setBounds(59, 127, 149, 14);
+		getContentPane().add(lblHeight);
+
+		JLabel lblWeight = new JLabel("Weigth (kg):");
+		lblWeight.setHorizontalAlignment(SwingConstants.TRAILING);
+		lblWeight.setBounds(59, 158, 149, 14);
+		getContentPane().add(lblWeight);
+
+		textName = new JTextField();
+		textName.setColumns(10);
+		textName.setBounds(218, 31, 280, 20);
+		getContentPane().add(textName);
+
+		JComboBox<String> boxGender = new JComboBox<String>();
+		boxGender.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent arg0) {
+				custGender = (String) boxGender.getSelectedItem();
+				custGender = custGender.substring(0);
+				System.out.println(custGender);				
+			}
+		});
+		boxGender.setBounds(218, 93, 280, 20);
+		getContentPane().add(boxGender);
+		boxGender.addItem("Male");
+		boxGender.addItem("Female");
+
+		textHeight = new JTextField();
+		textHeight.setColumns(10);
+		textHeight.setBounds(218, 124, 280, 20);
+		getContentPane().add(textHeight);
+
+		textWeight = new JTextField();
+		textWeight.setColumns(10);
+		textWeight.setBounds(218, 155, 280, 20);
+		getContentPane().add(textWeight);
+
+		JLabel lblDay = new JLabel("Day");
+		lblDay.setBounds(218, 65, 39, 14);
+		getContentPane().add(lblDay);
+
+		JComboBox<Integer> boxDay = new JComboBox<Integer>();
+		boxDay.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				day = (int) boxDay.getSelectedItem();
+				System.out.println("Day: "+day);	
+			}
+		});
+		boxDay.setBounds(249, 62, 41, 20);
+		getContentPane().add(boxDay);
+
+		for(int i=1; i<32; i++)
+		{
+			boxDay.addItem(i);
+		}
+
+		JLabel lblMonth = new JLabel("Month");
+		lblMonth.setBounds(300, 65, 39, 14);
+		getContentPane().add(lblMonth);
+
+		JComboBox<Integer> boxMonth = new JComboBox<Integer>();
+		boxMonth.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				month = (int) boxMonth.getSelectedItem();
+				System.out.println("Month: "+month);	
+			}
+		});
+		boxMonth.setBounds(349, 62, 41, 20);
+		getContentPane().add(boxMonth);
+		for(int i=1; i<13; i++)
+		{
+			boxMonth.addItem(i);
+		}
+
+		JLabel lblYear = new JLabel("Year");
+		lblYear.setBounds(400, 65, 39, 14);
+		getContentPane().add(lblYear);
+
+		JComboBox<Integer> boxYear = new JComboBox<Integer>();
+		boxYear.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				year = (int) boxYear.getSelectedItem();
+				System.out.println("Year: "+year);	
+			}
+		});
+		boxYear.setBounds(433, 62, 65, 20);
+		getContentPane().add(boxYear);
+		int currYear = Calendar.getInstance().get(Calendar.YEAR);
+		for(int i=1910; i<=currYear; i++)
+		{
+			boxYear.addItem(i);
+		}
+
+		JButton btnRegister = new JButton("Register");
+		btnRegister.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+
+				Vector <Exception> exceptions = new Vector<Exception>();
+
+				date = year+"-"+month+"-"+day;
+				System.out.println(date);
+
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd"); 
+				Date startDate;
+				String newDateString = null;			
+
+				try {
+					startDate = (Date) df.parse(date);
+					newDateString = df.format(startDate);
+					try {
+						Validator.validateDate("Date of birth", startDate, true);
+					} catch (MaximumDateException e) {
+						exceptions.add(e);		
+					}
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				try {
+
+					Validator.validate("Name",textName.getText(),true);
+
+				} catch (RequiredFieldException e) {
+					exceptions.add(e);
+				}
+
+				try 
+				{
+					Validator.validate("Height", textHeight.getText(), true, true, 0);
+				} catch (RequiredFieldException | InvalidNumberException | MinimumNumberException e) 
+				{
+					exceptions.add(e);
+				}
+
+				try 
+				{
+					Validator.validate("Weight", textWeight.getText(), true, true, 0);
+				} catch (RequiredFieldException | InvalidNumberException | MinimumNumberException e) 
+				{
+					exceptions.add(e);
+				}
+
+				int size = exceptions.size();
+				if(size == 0) {
+
+					try {
+						theQuery("insert into customer (CustomerName, DateOfBirth , Gender, Weight, Height) values('" + textName.getText()
+						+ "','"+newDateString+"','"+custGender+"','"+textWeight.getText()+"','"+textHeight.getText()+"')");
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(frame, "Something wrong with the query","Validation error",JOptionPane.WARNING_MESSAGE);
+					}
+
+				}
+				else 
+				{
+					String message = null;
+
+					if(size ==1)
+					{
+						message = exceptions.firstElement().getMessage();
+						JOptionPane.showMessageDialog(frame, message,"Validation error",JOptionPane.WARNING_MESSAGE);
+					}
+
+					else {
+						message = "Please fix the following errors:";
+						for (int i = 0; i < size; i++) {
+							message += "\n"+ (i+1) + "." +exceptions.get(i).getMessage();
+						}
+						JOptionPane.showMessageDialog(frame, message,"Validation error",JOptionPane.WARNING_MESSAGE);
+					}
+				}
+
+
+			}
+		});
+
+		btnRegister.setBounds(202, 198, 89, 23);
+		getContentPane().add(btnRegister);
+
+		JButton btnReturn = new JButton("Back to Main Page");
+		btnReturn.setBounds(315, 198, 149, 23);
+		getContentPane().add(btnReturn);
+
+	}
+
+	public void theQuery(String query) {
+		Connection con = null;
+		Statement st = null;
+		try {
+			con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/theme park", "root", "");
+			st = (Statement) con.createStatement();
+			st.executeUpdate(query);
+			JOptionPane.showMessageDialog(null, "Query Executed");
+		} catch (Exception ex) {
+			//			JOptionPane.showMessageDialog(null, ex.getMessage());
+		}
+	}
+}

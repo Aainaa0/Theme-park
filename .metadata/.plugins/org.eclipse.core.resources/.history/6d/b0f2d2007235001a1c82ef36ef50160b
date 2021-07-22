@@ -1,0 +1,85 @@
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JList;
+import javax.swing.AbstractListModel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JLabel;
+
+public class CreateSchedule extends JDialog {
+
+	public CreateSchedule(JFrame frame, String customerID, String name) {
+		super(frame, "Theme Park Trip Scheduler", true);
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 450, 300);
+		getContentPane().setLayout(null);
+			
+		ArrayList<String> array = new<String> ArrayList<String>();
+		try {
+			
+			Connection con = null;
+		      Statement st = null;
+		      ResultSet rs = null;
+			
+	          con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/theme park","root","");
+	          st = (Statement) con.createStatement();
+		    String s = "select AttributeID, Description from attribute";
+		    rs = (ResultSet) st.executeQuery(s);
+		
+			 while(rs.next())
+		        {
+				 array.add(rs.getString(1)+" - "+rs.getString(2));
+		        }
+			 
+			 System.out.println(array);
+		} catch (Exception e) {
+			
+		}
+		
+		
+//	    String subject[] = { "Math", " English", "SQL", "   java", "  c ", " c++ ",
+//	            " cobol ", "this is a test" };
+
+//	        JList<String> list = new JList<String>(subject);
+//	        JScrollPane s = new JScrollPane(list);
+//	        s.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+//	        s.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+//
+//	        f.getRootPane().setWindowDecorationStyle(JRootPane.PLAIN_DIALOG);
+//	        f.add(s);
+//	        f.setSize(300, 300);
+//	        f.setVisible(true);
+		
+		
+//		JScrollPane scrollPane = new JScrollPane();
+		JList<String> list = new JList(array.toArray());
+//		scrollPane.setViewportView(list);
+		list.setLayoutOrientation(JList.VERTICAL_WRAP);
+		list.setBounds(10, 32, 414, 177);
+		getContentPane().add(list);
+		
+		JButton btnSubmit = new JButton("Submit");
+		btnSubmit.setBounds(104, 227, 89, 23);
+		getContentPane().add(btnSubmit);
+		
+		JButton btnReturn = new JButton("Back to Main Page");
+		btnReturn.setBounds(217, 227, 149, 23);
+		getContentPane().add(btnReturn);
+		
+		JLabel lblLabel = new JLabel("Hi "+name+", please select your preferred attributes:");
+		lblLabel.setBounds(10, 11, 414, 14);
+		getContentPane().add(lblLabel);
+
+	}
+}

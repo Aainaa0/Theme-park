@@ -1,0 +1,39 @@
+package controller.validator;
+
+public class Validator 
+{
+	public static String validate(String field,String value,boolean required) 
+			throws RequiredFieldException 
+	{
+		if(required && (value==null || value.trim().isEmpty()))
+			throw new RequiredFieldException(field);
+
+		value = value.trim();
+
+		return value;
+	}
+
+	public static int validate(String field, String value, boolean required, boolean hasMinimum, double minimum)
+			throws RequiredFieldException, InvalidNumberException, MinimumNumberException
+	{
+		if(required && (value==null || value.trim().isEmpty()))
+			throw new RequiredFieldException(field);
+
+		value = value.trim();
+		int number=0;
+
+		try {
+			number = Integer.parseInt(value);
+		}
+		catch(NumberFormatException e)
+		{
+			throw new InvalidNumberException(field);
+		}
+
+
+		if(hasMinimum && number<minimum)
+			throw new MinimumNumberException(field, minimum);
+
+		return number;
+	}
+}

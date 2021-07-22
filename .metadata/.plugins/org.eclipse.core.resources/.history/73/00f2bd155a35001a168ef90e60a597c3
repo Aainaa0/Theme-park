@@ -1,0 +1,13 @@
+package controller.validator;
+
+public class MaximumDateException extends Exception {
+
+	private static final long serialVersionUID = 1L;
+	
+	public public MaximumDateException(String field)
+	{
+		super(field + " is required.");
+	}
+
+	
+}
