@@ -1,0 +1,204 @@
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.Statement;
+
+import controller.validator.RequiredFieldException;
+import controller.validator.Validator;
+
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Vector;
+import java.awt.event.ActionEvent;
+import javax.swing.JPasswordField;
+
+public class main {
+
+	private JFrame frame;
+	private JTextField textUsername;
+	private JPasswordField passwordField;
+
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+
+				try {
+
+					Connection con = null;
+					try {
+						Class.forName("com.mysql.jdbc.Driver").newInstance();
+						con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/oop", "root", "");
+						if (!con.isClosed())
+							System.out.println("Successfully connected to MySQL server...");
+					} 
+					catch(Exception e) 
+					{
+						System.err.println("Exception: " + e.getMessage());
+					} 
+					finally {
+						try 
+						{
+							if (con != null)
+								con.close();
+						} 
+						catch(SQLException e) {}
+					}
+
+					main window = new main();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	public main() {
+		initialize();
+	}
+
+	private void initialize() {
+
+		frame = new JFrame("Theme Park Trip Scheduler");
+		frame.setResizable(false);
+		frame.setBounds(500, 200, 404, 198);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
+
+		JLabel lblCustomerid = new JLabel("Username:");
+		lblCustomerid.setHorizontalAlignment(SwingConstants.TRAILING);
+		lblCustomerid.setBounds(22, 39, 104, 14);
+		frame.getContentPane().add(lblCustomerid);
+
+		textUsername = new JTextField();
+		textUsername.setBounds(146, 36, 200, 20);
+		frame.getContentPane().add(textUsername);
+		textUsername.setColumns(10);
+
+		JLabel lblPassword = new JLabel("Password:");
+		lblPassword.setHorizontalAlignment(SwingConstants.TRAILING);
+		lblPassword.setBounds(22, 76, 104, 14);
+		frame.getContentPane().add(lblPassword);
+
+		passwordField = new JPasswordField();
+		passwordField.setBounds(146, 73, 200, 20);
+		frame.getContentPane().add(passwordField);
+
+		JButton btnSubmit = new JButton("Submit");
+		frame.getRootPane().setDefaultButton(btnSubmit);
+		btnSubmit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				Vector <Exception> exceptions = new Vector<>();
+
+				try 
+				{
+					Validator.validate("Username",textUsername.getText(),true);
+				} 
+				catch (RequiredFieldException e2) 
+				{
+					System.out.println("RequiredFieldException!");
+					exceptions.add(e2);
+				}
+				
+				try 
+				{
+					Validator.validate("Password",passwordField.getText(),true);
+				} 
+				catch (RequiredFieldException e2) 
+				{
+					System.out.println("RequiredFieldException!");
+					exceptions.add(e2);
+				}
+
+				int size = exceptions.size();
+				if(size == 0) {
+
+					try {
+						Connection con = null;
+						Statement st = null;
+						ResultSet rs = null;
+
+						con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/theme park","root","");
+						st = (Statement) con.createStatement();
+						String s = "SELECT * FROM customer WHERE Username = '"+textUsername.getText()+"' AND Password ='"+passwordField.getText()+"'";
+						rs = (ResultSet) st.executeQuery(s);
+
+						if(rs.next())
+						{
+							String customerID = rs.getString(1);
+							String name = rs.getString(4);
+
+							JOptionPane.showMessageDialog(null,"Welcome, "+name+".");
+							frame.dispose();
+							Homepage home = new Homepage(frame, customerID, name);
+							home.setLocationRelativeTo(null);
+							home.setVisible(true);
+						}
+						else
+						{
+							try {
+								
+								String s2 = "SELECT * FROM customer WHERE Username = '"+textUsername.getText()+"'";
+								rs = (ResultSet) st.executeQuery(s2);
+
+								if(rs.next())
+								{
+									JOptionPane.showMessageDialog(frame, "Incorrect Password","Validation error",JOptionPane.WARNING_MESSAGE);
+								}
+								else
+								{
+									int reply = JOptionPane.showConfirmDialog(null, "Your record is currently no available in our system.\nWould you like to register as new customer?", "Theme Park Trip Scheduler", JOptionPane.YES_NO_OPTION);
+									if (reply == JOptionPane.YES_OPTION) 
+									{
+										Register register = new Register(frame);
+										register.setLocationRelativeTo(null);
+										register.setVisible(true);
+									}
+								}
+							} catch (Exception e3) {
+
+							}		
+						}
+
+					} catch (Exception e2) {
+
+					}
+
+				}
+				else 
+				{
+					String message = null;
+
+					if(size ==1)
+					{
+						message = exceptions.firstElement().getMessage();
+						JOptionPane.showMessageDialog(frame, message,"Validation error",JOptionPane.WARNING_MESSAGE);
+					}
+
+					else {
+						message = "Please fix the following errors:";
+						for (int i = 0; i < size; i++) {
+							message += "\n"+ (i+1) + "." +exceptions.get(i).getMessage();
+						}
+						JOptionPane.showMessageDialog(frame, message,"Validation error",JOptionPane.WARNING_MESSAGE);
+					}
+				}
+
+
+			}
+
+		});
+		btnSubmit.setBounds(134, 121, 89, 23);
+		frame.getContentPane().add(btnSubmit);
+	}
+}
