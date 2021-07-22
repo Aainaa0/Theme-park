@@ -1,0 +1,103 @@
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
+public class Registerr extends JDialog {
+
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
+	private JTextField textName;
+	private JTextField textDob;
+	private JTextField textHeight;
+	private JTextField textWeigth;
+	private JLabel lblGender;
+	private JLabel lblHeight;
+	private JLabel lblWeigth;
+	private JButton btnRegister;
+	private JButton btnBack;
+
+	public Registerr(JFrame frame) {
+//		setBounds(100, 100, 450, 300);
+//		getContentPane().setLayout(null);
+		
+		super(frame,"Theme Park Trip Scheduler",true);
+		
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 487, 306);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		textName = new JTextField();
+		textName.setBounds(200, 45, 172, 20);
+		contentPane.add(textName);
+		textName.setColumns(10);
+		
+		textDob = new JTextField();
+		textDob.setColumns(10);
+		textDob.setBounds(200, 76, 172, 20);
+		contentPane.add(textDob);
+		
+		textHeight = new JTextField();
+		textHeight.setColumns(10);
+		textHeight.setBounds(200, 138, 172, 20);
+		contentPane.add(textHeight);
+		
+		textWeigth = new JTextField();
+		textWeigth.setColumns(10);
+		textWeigth.setBounds(200, 169, 172, 20);
+		contentPane.add(textWeigth);
+		
+		JComboBox<String> GenderBox = new JComboBox<String>();
+		GenderBox.setBounds(200, 107, 172, 20);
+		contentPane.add(GenderBox);
+		GenderBox.addItem("Male");
+		GenderBox.addItem("Female");
+		
+		JLabel lblName = new JLabel("Name:");
+		lblName.setHorizontalAlignment(SwingConstants.TRAILING);
+		lblName.setBounds(41, 48, 149, 14);
+		contentPane.add(lblName);
+		
+		JLabel lblDob = new JLabel("Date of Birth (dd/mm/yyyy):");
+		lblDob.setHorizontalAlignment(SwingConstants.TRAILING);
+		lblDob.setBounds(10, 79, 180, 14);
+		contentPane.add(lblDob);
+		
+		lblGender = new JLabel("Gender:");
+		lblGender.setHorizontalAlignment(SwingConstants.TRAILING);
+		lblGender.setBounds(41, 110, 149, 14);
+		contentPane.add(lblGender);
+		
+		lblHeight = new JLabel("Height (cm):");
+		lblHeight.setHorizontalAlignment(SwingConstants.TRAILING);
+		lblHeight.setBounds(41, 141, 149, 14);
+		contentPane.add(lblHeight);
+		
+		lblWeigth = new JLabel("Weigth (kg):");
+		lblWeigth.setHorizontalAlignment(SwingConstants.TRAILING);
+		lblWeigth.setBounds(41, 172, 149, 14);
+		contentPane.add(lblWeigth);
+		
+		btnRegister = new JButton("Register");
+		btnRegister.setBounds(118, 211, 89, 23);
+		contentPane.add(btnRegister);
+		
+		btnBack = new JButton("Back to Main Page");
+		btnBack.setBounds(231, 211, 149, 23);
+		contentPane.add(btnBack);
+		
+		
+	}
+
+}
